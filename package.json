@@ -6,7 +6,16 @@
   "type": "module",
   "scripts": {
     "start": "NODE_OPTIONS='--import tsx' node .",
-    "test": "NODE_OPTIONS='--import tsx' ava"
+    "test": "ava"
+  },
+  "ava": {
+    "extensions": {
+      "ts": "module"
+    },
+    "nodeArguments": [
+      "--import=tsx"
+    ],
+    "workerThreads": false
   },
   "keywords": [],
   "author": "HoJeong Go <seia@outlook.kr>",
