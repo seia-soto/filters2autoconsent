@@ -1,7 +1,7 @@
 {
   "name": "filters2autoconsent",
   "version": "1.0.0",
-  "description": "",
+  "description": "Adblocker filter-like syntax to autoconsent rules and test suites.",
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
