@@ -2,7 +2,7 @@ export enum Keywords {
 	RuleDeclaration = '##',
 	NegativeChainableStart = '-',
 	PositiveChainableStart = '+',
-	ChainableActionStart = ':',
+	Colon = ':',
 	ChainableActionOptionsStart = '(',
 	ChainableActionOptionsEnd = ')',
 	ParameterDelimiter = ',',
@@ -156,7 +156,7 @@ export const parseActionDeclarationOptions = (i: number, text: string, hints: {e
 
 	for (; i < hints.end; i++) {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-		if (text[i] === Keywords.ChainableActionStart) {
+		if (text[i] === Keywords.Colon) {
 			name = {
 				type: NodeTypes.Identifier,
 				start,
@@ -169,7 +169,7 @@ export const parseActionDeclarationOptions = (i: number, text: string, hints: {e
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		} else if (text[i] === Keywords.ParameterDelimiter) {
 			if (!name) {
-				throw new SyntaxError('Expected the name of chainable action option before value but name was not found!');
+				throw new SyntaxError('The name of parameter delimiter was not found!');
 			}
 
 			options.push({
@@ -207,17 +207,17 @@ export const parseActionDeclarations = (i: number, text: string, hints: {eol: nu
 
 	for (let k = i; k < hints.eol; k++) {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-		if (text[k] === Keywords.ChainableActionStart) {
+		if (text[k] === Keywords.Colon) {
 			const nextBracket = text.indexOf(Keywords.ChainableActionOptionsStart, k + 6 /* 1 + minimal len of action type */);
 
 			if (nextBracket > hints.eol) {
-				throw new SyntaxError('Expected ChainableActionOptionsStart after ChainableActionStart before the eol!');
+				throw new SyntaxError('The start of chainable action options was not found!');
 			}
 
 			const nextClosingBracket = text.indexOf(Keywords.ChainableActionOptionsEnd, nextBracket + 1);
 
 			if (nextBracket > hints.eol) {
-				throw new SyntaxError('Expected ChainableActionOptionsEnd after ChainableActionOptionsStart before the eol!');
+				throw new SyntaxError('The end of chainable action options was not found!');
 			}
 
 			const kind = text.slice(k + 1, nextBracket) as ActionTypes;
@@ -242,11 +242,6 @@ export const parseActionDeclarations = (i: number, text: string, hints: {eol: nu
 };
 
 export const parseChainableDeclaration = (i: number, text: string, hints: {isPositive: boolean; eol: number}) => {
-	// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-	if (text[hints.eol - 1] !== Keywords.ChainableActionOptionsEnd) {
-		throw new SyntaxError('Expected ChainableActionOptionsEnd at the eol!');
-	}
-
 	const actions = parseActionDeclarations(i, text, {eol: hints.eol});
 	const chainableDeclaration: ChainableDeclaration = {
 		type: NodeTypes.ChainableDeclaration,
