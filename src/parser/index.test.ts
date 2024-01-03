@@ -18,18 +18,19 @@ test('RuleDeclaration', t => {
 
 test('RuleDeclaration and ChainableDeclaration', t => {
 	const content = `domain.tld##test
--div:waitFor(timeout: 500)`;
+-div:waitFor(timeout: 500):click()
++button:waitFor():click(all: true)`;
 	const file = parse(content);
 
 	t.deepEqual(file, {
 		type: 'File',
 		start: 0,
-		end: 43,
+		end: 86,
 		body: [
 			{
 				type: 'RuleDeclaration',
 				start: 0,
-				end: 43,
+				end: 86,
 				domain: {
 					type: 'Identifier',
 					start: 0,
@@ -46,7 +47,7 @@ test('RuleDeclaration and ChainableDeclaration', t => {
 					{
 						type: 'ChainableDeclaration',
 						start: 17,
-						end: 43,
+						end: 51,
 						positive: false,
 						actions: [
 							{
@@ -71,12 +72,62 @@ test('RuleDeclaration and ChainableDeclaration', t => {
 									},
 								],
 							},
+							{
+								type: 'ActionDeclaration',
+								action: 'click',
+								start: 43,
+								end: 50,
+								options: [],
+							},
 						],
 						selector: {
 							type: 'Identifier',
 							start: 18,
 							end: 21,
 							value: 'div',
+						},
+					},
+					{
+						type: 'ChainableDeclaration',
+						start: 52,
+						end: 86,
+						positive: true,
+						actions: [
+							{
+								type: 'ActionDeclaration',
+								action: 'waitFor',
+								start: 59,
+								end: 68,
+								options: [],
+							},
+							{
+								type: 'ActionDeclaration',
+								action: 'click',
+								start: 69,
+								end: 85,
+								options: [
+									{
+										name: {
+											type: 'Identifier',
+											start: 76,
+											end: 79,
+											value: 'all',
+										},
+										value: {
+											type: 'Identifier',
+											start: 80,
+											end: 85,
+											value: ' true',
+										},
+									},
+								],
+							},
+						],
+						selector: {
+							type: 'Identifier',
+							start: 53,
+							end: 59,
+							value: 'button',
 						},
 					},
 				],
