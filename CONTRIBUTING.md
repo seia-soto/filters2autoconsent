@@ -13,8 +13,10 @@ cd filters2autoconsent
 
 You can find the proposed filter syntax in [`/test/resources/rules.txt`](/test/resources/rules.txt).
 
-| Type            | Keyword | Description                         | Status             |
-|-----------------|---------|-------------------------------------|--------------------|
-| File            | (none)  | The entire file.                    | ✅ Supported        |
-| RuleDeclaration | `##`    | The declaration identifier of rule. | 📝 Partial support |
-| Identifier      | (none)  | The identifier or any value.        | 📝 Type dependant  |
+| Type                 | Format                                                       | Description                                      | Status            |
+|----------------------|--------------------------------------------------------------|--------------------------------------------------|-------------------|
+| File                 | (none)                                                       | The entire file.                                 | ✅ Supported       |
+| RuleDeclaration      | `domain.tld##selector`                                       | The declaration identifier of the rule.          | ✅ Supported       |
+| ChainableDeclaration | `-selector` & `+selector`                                    | The possible action chain for the rule.          | ✅ Supported       |
+| ActionDeclaration    | `ChainableDeclaration:ActionType([param1][, param2][, ...])` | The list of actions to run on specific selector. | ✅ Supported       |
+| Identifier           | (none)                                                       | The identifier or any value.                     | 📝 Type dependant |

@@ -19,10 +19,10 @@ domain.tld##detectionSelector$optionA,optionB=test,optionC=1
 +button:click()
 
 domain.tld##detectionSelector
--button:waitFor(500):click(all: true, optional: true)
+-button:waitFor(timeout: 500):click(all: true, optional: true)
 +button:click()
 
 domain.tld##detectionSelector
--div:waitFor(500)
+-div:waitFor(timeout: 500)
 -button:click(all: true, optional: true)
 +button:click()
