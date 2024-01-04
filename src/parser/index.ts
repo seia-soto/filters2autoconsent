@@ -3,8 +3,14 @@ export enum Keywords {
 	NegativeChainableStart = '-',
 	PositiveChainableStart = '+',
 	Colon = ':',
-	ChainableActionOptionsStart = '(',
-	ChainableActionOptionsEnd = ')',
+	ParenthesesOpen = '(',
+	ParenthesesClose = ')',
+	BracketsOpen = '[',
+	BracketsClose = ']',
+	Quote = '\'',
+	DoubleQuote = '"',
+	ParameterStart = '$',
+	ParameterValueStart = '=',
 	ParameterDelimiter = ',',
 	LineBreak = '\n',
 }
@@ -33,6 +39,10 @@ export type RuleDeclaration = BaseNode & {
 	domain: Identifier;
 	detectionSelector: Identifier;
 	chains: ChainableDeclaration[];
+	options: Array<{
+		name: Identifier;
+		value?: Identifier;
+	}>;
 };
 
 export enum ActionTypes {
@@ -99,6 +109,93 @@ export const isRuleDeclarationLine = (i: number, text: string, hints: {nextLineB
 	return [nextRuleDeclaration < hints.nextLineBreak, {nextRuleDeclaration}] as const;
 };
 
+export const parseRuleDeclarationOptions = (i: number, text: string, hints: {eol: number}) => {
+	const options: RuleDeclaration['options'] = [];
+
+	let k = i;
+
+	for (let depth = 0, stringifyCount = 0; k < hints.eol; k++) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+		if (text[k] === Keywords.ParenthesesOpen || text[k] === Keywords.BracketsOpen) {
+			depth++;
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+		} else if (text[k] === Keywords.ParenthesesClose || text[k] === Keywords.BracketsClose) {
+			depth--;
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+		} else if (text[k] === Keywords.Quote || text[k] === Keywords.DoubleQuote) {
+			stringifyCount++;
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+		} else if (!depth && !(stringifyCount % 2) && text[k] === Keywords.ParameterStart) {
+			break;
+		}
+	}
+
+	if (k < 0 || k > hints.eol) {
+		return [options, {parameterStart: i}] as const;
+	}
+
+	let name: Identifier | false = false;
+	let start = k + 1;
+
+	for (i = k; i < hints.eol; i++) {
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+		if (text[i] === Keywords.ParameterDelimiter) {
+			if (name) {
+				options.push({
+					name,
+					value: {
+						type: NodeTypes.Identifier,
+						start,
+						end: i,
+						value: text.slice(start, i),
+					},
+				});
+			} else {
+				options.push({
+					name: {
+						type: NodeTypes.Identifier,
+						start,
+						end: i,
+						value: text.slice(start, i),
+					},
+				});
+			}
+
+			start = i + 1;
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+		} else if (text[i] === Keywords.ParameterValueStart) {
+			name = {
+				type: NodeTypes.Identifier,
+				start,
+				end: i,
+				value: text.slice(start, i),
+			};
+
+			start = i + 1;
+		}
+	}
+
+	if (name) {
+		if (name.end === i) {
+			options.push({
+				name,
+			});
+		} else {
+			options.push({
+				name,
+				value: {
+					type: NodeTypes.Identifier,
+					start,
+					end: i,
+					value: text.slice(start, i),
+				},
+			});
+		}
+	}
+
+	return [options, {parameterStart: k}] as const;
+};
+
 export const parseRuleDeclaration = (i: number, text: string, hints: {nextLineBreak: number; eof: number} & ReturnType<typeof isRuleDeclarationLine>[1]) => {
 	let end = hints.nextLineBreak;
 
@@ -120,6 +217,8 @@ export const parseRuleDeclaration = (i: number, text: string, hints: {nextLineBr
 		end = k;
 	}
 
+	const [options, optionsHints] = parseRuleDeclarationOptions(i, text, {eol: hints.nextLineBreak});
+
 	const ruleDeclaration: RuleDeclaration = {
 		type: NodeTypes.RuleDeclaration,
 		start: i,
@@ -134,9 +233,10 @@ export const parseRuleDeclaration = (i: number, text: string, hints: {nextLineBr
 			type: NodeTypes.Identifier,
 			start: hints.nextRuleDeclaration + 2,
 			end: hints.nextLineBreak,
-			value: text.slice(hints.nextRuleDeclaration + 2, hints.nextLineBreak),
+			value: text.slice(hints.nextRuleDeclaration + 2, optionsHints.parameterStart),
 		},
 		chains,
+		options,
 	};
 
 	return ruleDeclaration;
@@ -237,13 +337,13 @@ export const parseActionDeclarations = (i: number, text: string, hints: {eol: nu
 	for (let k = i; k < hints.eol; k++) {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		if (text[k] === Keywords.Colon) {
-			const nextBracket = text.indexOf(Keywords.ChainableActionOptionsStart, k + 6 /* 1 + minimal len of action type */);
+			const nextBracket = text.indexOf(Keywords.ParenthesesOpen, k + 6 /* 1 + minimal len of action type */);
 
 			if (nextBracket > hints.eol) {
 				throw new SyntaxError('The start of chainable action options was not found!');
 			}
 
-			const nextClosingBracket = text.indexOf(Keywords.ChainableActionOptionsEnd, nextBracket + 1);
+			const nextClosingBracket = text.indexOf(Keywords.ParenthesesClose, nextBracket + 1);
 
 			if (nextBracket > hints.eol) {
 				throw new SyntaxError('The end of chainable action options was not found!');

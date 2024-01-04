@@ -131,6 +131,62 @@ test('RuleDeclaration and ChainableDeclaration', t => {
 						},
 					},
 				],
+				options: [],
+			},
+		],
+	});
+});
+
+test('RuleDeclarationOptions', t => {
+	const content = 'domain.tld##test[$id="value"]$cosmetic,name=test';
+	const file = parse(content);
+
+	t.deepEqual(file, {
+		type: 'File',
+		start: 0,
+		end: 48,
+		body: [
+			{
+				type: 'RuleDeclaration',
+				start: 0,
+				end: 48,
+				domain: {
+					type: 'Identifier',
+					start: 0,
+					end: 10,
+					value: 'domain.tld',
+				},
+				detectionSelector: {
+					type: 'Identifier',
+					start: 12,
+					end: 48,
+					value: 'test[$id="value"]',
+				},
+				chains: [],
+				options: [
+					{
+						name: {
+							type: 'Identifier',
+							start: 30,
+							end: 38,
+							value: 'cosmetic',
+						},
+					},
+					{
+						name: {
+							type: 'Identifier',
+							start: 39,
+							end: 43,
+							value: 'name',
+						},
+						value: {
+							type: 'Identifier',
+							start: 44,
+							end: 48,
+							value: 'test',
+						},
+					},
+				],
 			},
 		],
 	});
