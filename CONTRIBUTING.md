@@ -16,7 +16,7 @@ You can find the proposed filter syntax in [`/test/resources/rules.txt`](/test/r
 | Type                 | Format                                                       | Description                                      | Status            |
 |----------------------|--------------------------------------------------------------|--------------------------------------------------|-------------------|
 | File                 | (none)                                                       | The entire file.                                 | ✅ Supported       |
-| RuleDeclaration      | `domain.tld##selector`                                       | The declaration identifier of the rule.          | ✅ Supported       |
+| RuleDeclaration      | `domain.tld##selector[$option1=value1][, option2][, ...]`    | The declaration identifier of the rule.          | ✅ Supported       |
 | ChainableDeclaration | `-selector` & `+selector`                                    | The possible action chain for the rule.          | ✅ Supported       |
 | ActionDeclaration    | `ChainableDeclaration:ActionType([param1][, param2][, ...])` | The list of actions to run on specific selector. | ✅ Supported       |
 | Identifier           | (none)                                                       | The identifier or any value.                     | 📝 Type dependant |
