@@ -65,9 +65,9 @@ test('RuleDeclaration and ChainableDeclaration', t => {
 										},
 										value: {
 											type: 'Identifier',
-											start: 38,
+											start: 39,
 											end: 42,
-											value: ' 500',
+											value: '500',
 										},
 									},
 								],
@@ -115,9 +115,9 @@ test('RuleDeclaration and ChainableDeclaration', t => {
 										},
 										value: {
 											type: 'Identifier',
-											start: 80,
+											start: 81,
 											end: 85,
-											value: ' true',
+											value: 'true',
 										},
 									},
 								],

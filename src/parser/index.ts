@@ -164,23 +164,37 @@ export const parseActionDeclarationOptions = (i: number, text: string, hints: {e
 
 	let name: Identifier | false = false;
 	let start = i;
+	let locked = false;
 
 	for (; i < hints.end; i++) {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		if (text[i] === Keywords.Colon) {
+			let end = i;
+
+			while (text[end] === ' ') {
+				end--;
+			}
+
 			name = {
 				type: NodeTypes.Identifier,
 				start,
-				end: i,
-				value: text.slice(start, i),
+				end,
+				value: text.slice(start, end),
 			};
 
 			// Reset `start` for next value
 			start = i + 1;
+			locked = false;
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
 		} else if (text[i] === Keywords.ParameterDelimiter) {
 			if (!name) {
 				throw new SyntaxError('The name of parameter delimiter was not found!');
+			}
+
+			let end = i;
+
+			while (text[end] === ' ') {
+				end--;
 			}
 
 			options.push({
@@ -188,13 +202,17 @@ export const parseActionDeclarationOptions = (i: number, text: string, hints: {e
 				value: {
 					type: NodeTypes.Identifier,
 					start,
-					end: i,
-					value: text.slice(start, i),
+					end,
+					value: text.slice(start, end),
 				},
 			});
 
 			// Reset `start` for next name
 			start = i + 1;
+			locked = false;
+		} else if (!locked && text[i] !== ' ') {
+			start = i;
+			locked = true;
 		}
 	}
 
