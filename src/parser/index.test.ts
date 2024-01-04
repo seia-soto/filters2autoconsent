@@ -52,7 +52,7 @@ test('RuleDeclaration and ChainableDeclaration', t => {
 						actions: [
 							{
 								type: 'ActionDeclaration',
-								action: 'waitFor',
+								kind: 'waitFor',
 								start: 21,
 								end: 42,
 								options: [
@@ -74,7 +74,7 @@ test('RuleDeclaration and ChainableDeclaration', t => {
 							},
 							{
 								type: 'ActionDeclaration',
-								action: 'click',
+								kind: 'click',
 								start: 43,
 								end: 50,
 								options: [],
@@ -95,14 +95,14 @@ test('RuleDeclaration and ChainableDeclaration', t => {
 						actions: [
 							{
 								type: 'ActionDeclaration',
-								action: 'waitFor',
+								kind: 'waitFor',
 								start: 59,
 								end: 68,
 								options: [],
 							},
 							{
 								type: 'ActionDeclaration',
-								action: 'click',
+								kind: 'click',
 								start: 69,
 								end: 85,
 								options: [

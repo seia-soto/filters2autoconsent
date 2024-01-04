@@ -36,15 +36,26 @@ export type RuleDeclaration = BaseNode & {
 };
 
 export enum ActionTypes {
-	Click = 'click',
+	Exists = 'exists',
+	Visible = 'visible',
 	WaitFor = 'waitFor',
+	WaitForVisible = 'waitForVisible',
+	Click = 'click',
+	WaitForThenClick = 'waitForThenClick',
+	Wait = 'wait',
+	Hide = 'hide',
+	Eval = 'eval',
+	If = 'if',
+	Then = 'then',
+	Else = 'else',
+	Any = 'any',
 }
 
 export const actionTypes = Object.values(ActionTypes);
 
 export type ActionDeclaration = BaseNode & {
 	type: NodeTypes.ActionDeclaration;
-	action: ActionTypes;
+	kind: ActionTypes;
 	options: Array<{
 		name: Identifier;
 		value: Identifier;
@@ -228,7 +239,7 @@ export const parseActionDeclarations = (i: number, text: string, hints: {eol: nu
 
 			const action: ActionDeclaration = {
 				type: NodeTypes.ActionDeclaration,
-				action: kind,
+				kind,
 				start: k,
 				end: nextClosingBracket,
 				options: parseActionDeclarationOptions(nextBracket + 1, text, {end: nextClosingBracket + 1}),
