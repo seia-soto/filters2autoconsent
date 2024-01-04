@@ -1,7 +1,7 @@
 export enum Keywords {
 	RuleDeclaration = '##',
-	NegativeChainableStart = '-',
-	PositiveChainableStart = '+',
+	Minus = '-',
+	Plus = '+',
 	Colon = ':',
 	ParenthesesOpen = '(',
 	ParenthesesClose = ')',
@@ -9,9 +9,9 @@ export enum Keywords {
 	BracketsClose = ']',
 	Quote = '\'',
 	DoubleQuote = '"',
-	ParameterStart = '$',
-	ParameterValueStart = '=',
-	ParameterDelimiter = ',',
+	Dollar = '$',
+	Equals = '=',
+	Comma = ',',
 	LineBreak = '\n',
 }
 
@@ -125,7 +125,7 @@ export const parseRuleDeclarationOptions = (i: number, text: string, hints: {eol
 		} else if (text[k] === Keywords.Quote || text[k] === Keywords.DoubleQuote) {
 			stringifyCount++;
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-		} else if (!depth && !(stringifyCount % 2) && text[k] === Keywords.ParameterStart) {
+		} else if (!depth && !(stringifyCount % 2) && text[k] === Keywords.Dollar) {
 			break;
 		}
 	}
@@ -139,7 +139,7 @@ export const parseRuleDeclarationOptions = (i: number, text: string, hints: {eol
 
 	for (i = k; i < hints.eol; i++) {
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-		if (text[i] === Keywords.ParameterDelimiter) {
+		if (text[i] === Keywords.Comma) {
 			if (name) {
 				options.push({
 					name,
@@ -163,7 +163,7 @@ export const parseRuleDeclarationOptions = (i: number, text: string, hints: {eol
 
 			start = i + 1;
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-		} else if (text[i] === Keywords.ParameterValueStart) {
+		} else if (text[i] === Keywords.Equals) {
 			name = {
 				type: NodeTypes.Identifier,
 				start,
@@ -247,12 +247,12 @@ export const isChainableDeclaration = (i: number, text: string, hints: {eof: num
 	const eol = getNextLineBreakOrEoF(i, text, hints.eof);
 
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-	if (text[i] === Keywords.PositiveChainableStart) {
+	if (text[i] === Keywords.Plus) {
 		return [true, {isPositive: true, eol}] as const;
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-	if (text[i] === Keywords.NegativeChainableStart) {
+	if (text[i] === Keywords.Minus) {
 		return [true, {isPositive: false, eol}] as const;
 	}
 
@@ -286,7 +286,7 @@ export const parseActionDeclarationOptions = (i: number, text: string, hints: {e
 			start = i + 1;
 			locked = false;
 		// eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
-		} else if (text[i] === Keywords.ParameterDelimiter) {
+		} else if (text[i] === Keywords.Comma) {
 			if (!name) {
 				throw new SyntaxError('The name of parameter delimiter was not found!');
 			}
