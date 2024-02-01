@@ -172,7 +172,8 @@ export const transform = (rule: RuleDeclaration): AutoCmp => {
 		],
 		detectPopup: [
 			{
-				exists: rule.detectionSelector.value,
+				visible: rule.detectionSelector.value,
+				check: 'any',
 			},
 		],
 		optIn,
