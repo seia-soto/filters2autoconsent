@@ -348,6 +348,8 @@ export const parseActionDeclarations = (i: number, text: string, hints: {eol: nu
 			const kind = text.slice(k + 1, nextBracket) as ActionTypes;
 
 			if (!actionTypes.includes(kind)) {
+				k = nextClosingBracket;
+
 				continue;
 			}
 
@@ -360,6 +362,8 @@ export const parseActionDeclarations = (i: number, text: string, hints: {eol: nu
 			};
 
 			actions.push(action);
+
+			k = nextClosingBracket;
 		}
 	}
 
