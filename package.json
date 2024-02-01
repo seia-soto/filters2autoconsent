@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "start": "NODE_OPTIONS='--import tsx' node .",
+    "start": "node .",
     "test": "ava"
   },
   "ava": {
