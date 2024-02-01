@@ -197,32 +197,12 @@ export const parseRuleDeclarationOptions = (i: number, text: string, hints: {eol
 };
 
 export const parseRuleDeclaration = (i: number, text: string, hints: {nextLineBreak: number; eof: number} & ReturnType<typeof isRuleDeclarationLine>[1]) => {
-	let end = hints.nextLineBreak;
-
-	const chains: ChainableDeclaration[] = [];
-
-	for (let k = i; k < hints.eof; k++) {
-		const [chainableDeclarationFound, chainableDeclarationHints] = isChainableDeclaration(k, text, {eof: hints.eof});
-
-		if (!chainableDeclarationFound) {
-			k = chainableDeclarationHints.eol;
-
-			continue;
-		}
-
-		const chainableDeclaration = parseChainableDeclaration(k, text, chainableDeclarationHints);
-
-		chains.push(chainableDeclaration);
-		k = chainableDeclaration.end;
-		end = k;
-	}
-
 	const [options, optionsHints] = parseRuleDeclarationOptions(i, text, {eol: hints.nextLineBreak});
 
 	const ruleDeclaration: RuleDeclaration = {
 		type: NodeTypes.RuleDeclaration,
 		start: i,
-		end,
+		end: hints.nextLineBreak,
 		domain: {
 			type: NodeTypes.Identifier,
 			start: i,
@@ -235,9 +215,25 @@ export const parseRuleDeclaration = (i: number, text: string, hints: {nextLineBr
 			end: hints.nextLineBreak,
 			value: text.slice(hints.nextRuleDeclaration + 2, optionsHints.parameterStart),
 		},
-		chains,
+		chains: [],
 		options,
 	};
+
+	for (let k = hints.nextLineBreak + 1; k < hints.eof; k++) {
+		const [chainableDeclarationFound, chainableDeclarationHints] = isChainableDeclaration(k, text, {eof: hints.eof});
+
+		if (!chainableDeclarationFound) {
+			ruleDeclaration.end = chainableDeclarationHints.eol;
+
+			break;
+		}
+
+		const chainableDeclaration = parseChainableDeclaration(k, text, chainableDeclarationHints);
+
+		ruleDeclaration.chains.push(chainableDeclaration);
+		k = chainableDeclaration.end;
+		ruleDeclaration.end = k;
+	}
 
 	return ruleDeclaration;
 };

@@ -54,8 +54,8 @@ const use = (content: string) => {
 	const tree = parse(content);
 	const cmps: AutoCmp[] = [];
 
-	for (const cmp of tree.body) {
-		cmps.push(transform(cmp));
+	for (const rule of tree.body) {
+		cmps.push(transform(rule));
 	}
 
 	return cmps;
